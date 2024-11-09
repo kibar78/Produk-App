@@ -1,6 +1,7 @@
 package com.example.produkapp.ui.checkout
 
 import android.os.Bundle
+import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
@@ -33,5 +34,12 @@ class CheckoutActivity : AppCompatActivity() {
             binding.tvTotalPrice.text = "Total Harga: $$totalPrice"
 
         }
+        binding.btnConfirmCheckout.setOnClickListener {
+            showToast("Checkout Success")
+        }
+    }
+
+    private fun showToast(message: String) {
+        Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
     }
 }

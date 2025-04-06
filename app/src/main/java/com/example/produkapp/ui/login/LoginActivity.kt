@@ -3,6 +3,8 @@ package com.example.produkapp.ui.login
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
+import android.view.View
+import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
@@ -11,6 +13,7 @@ import androidx.core.view.WindowInsetsCompat
 import com.example.produkapp.MainActivity
 import com.example.produkapp.R
 import com.example.produkapp.databinding.ActivityLoginBinding
+import com.example.produkapp.utils.ResultState
 import com.example.produkapp.utils.ViewModelFactory
 
 class LoginActivity : AppCompatActivity() {
@@ -49,13 +52,37 @@ class LoginActivity : AppCompatActivity() {
                     etPassword.error = "Password minimal 5 karakter"
                     return@setOnClickListener
                 }else{
-                    viewModel.saveLoginData(username, password)
-                    val goHome = Intent(this@LoginActivity, MainActivity::class.java)
-                    startActivity(goHome)
-                    finish()
-                    Log.i("LoginActivity", "Username: $username, Password: $password")
+                    viewModel.login(username,password).observe(this@LoginActivity){Result->
+                        when(Result){
+                            is ResultState.Loading -> {
+                                showLoading(true)
+                                Log.i("LoginActivity", "Loading")
+                            }
+                            is ResultState.Success ->{
+                                viewModel.saveLoginData(username)
+                                showLoading(false)
+                                val goHome = Intent(this@LoginActivity, MainActivity::class.java)
+                                startActivity(goHome)
+                                finish()
+                                Log.i("LoginActivity", "Username: $username, Password: $password")
+                            }
+                            is ResultState.Error -> {
+                                showLoading(false)
+                                showToast(Result.error)
+                                Log.e("LoginActivity", "Error: ${Result.error}")
+                            }
+                        }
+                    }
                 }
             }
         }
+    }
+
+    private fun showToast(message: String) {
+        Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
+    }
+
+    private fun showLoading(isLoading: Boolean) {
+        binding.pbLoading.visibility = if (isLoading) View.VISIBLE else View.GONE
     }
 }

@@ -16,23 +16,20 @@ class LoginPreferences private constructor(
 {
 
     // Fungsi untuk menyimpan username dan password ke DataStore
-    suspend fun saveLoginData(username: String, password: String) {
+    suspend fun saveUsernameData(username: String) {
         dataStore.edit { preferences ->
             preferences[USERNAME_KEY] = username
-            preferences[PASSWORD_KEY] = password
         }
     }
 
-    fun getLoginData(): Flow<Pair<String, String>> {
+    fun getUsername(): Flow<String> {
         return dataStore.data.map { preferences ->
-            val username = preferences[USERNAME_KEY] ?: ""
-            val password = preferences[PASSWORD_KEY] ?: ""
-            Pair(username, password)
+            preferences[USERNAME_KEY] ?: ""
         }
     }
+
     companion object {
         private val USERNAME_KEY = stringPreferencesKey("username")
-        private val PASSWORD_KEY = stringPreferencesKey("password") // jika perlu, sebaiknya terenkripsi
 
         @Volatile
         private var INSTANCE: LoginPreferences? = null

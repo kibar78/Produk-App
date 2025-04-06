@@ -10,6 +10,7 @@ import com.example.produkapp.ui.category.CategoryViewModel
 import com.example.produkapp.ui.detail.DetailViewModel
 import com.example.produkapp.ui.home.HomeViewModel
 import com.example.produkapp.ui.login.LoginViewModel
+import com.example.produkapp.ui.profile.AccountViewModel
 
 class ViewModelFactory private constructor(private val repository: Repository):
 ViewModelProvider.NewInstanceFactory(){
@@ -33,6 +34,9 @@ ViewModelProvider.NewInstanceFactory(){
             }
             modelClass.isAssignableFrom(CartViewModel::class.java)->{
                 CartViewModel(repository) as T
+            }
+            modelClass.isAssignableFrom(AccountViewModel::class.java)->{
+                AccountViewModel(repository) as T
             }
             else -> throw IllegalArgumentException("Unknown ViewModel class: " + modelClass.name)
         }

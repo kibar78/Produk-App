@@ -4,6 +4,7 @@ import androidx.lifecycle.LiveData
 import com.example.produkapp.data.local.CartDao
 import com.example.produkapp.data.local.ProductEntity
 import com.example.produkapp.data.network.ApiService
+import com.example.produkapp.data.network.response.LoginResponse
 import com.example.produkapp.data.network.response.ProdukResponseItem
 import com.example.produkapp.ui.login.LoginPreferences
 import kotlinx.coroutines.flow.Flow
@@ -25,12 +26,20 @@ class Repository private constructor(
         return apiService.getProductsByCategory(category)
     }
 
-    suspend fun saveLoginData(username: String, password: String) {
-        pref.saveLoginData(username, password)
+    suspend fun getUser(): List<LoginResponse> {
+        return apiService.getUser()
     }
 
-    fun getLoginData(): Flow<Pair<String, String>> {
-        return pref.getLoginData()
+    suspend fun saveUsernameData(username: String) {
+        pref.saveUsernameData(username)
+    }
+
+    fun getUsernameData(): Flow<String>{
+        return pref.getUsername()
+    }
+
+    suspend fun login(username: String, password: String): LoginResponse {
+        return apiService.login(username,password)
     }
 
     suspend fun insert(product: ProductEntity) = cart.insert(product)

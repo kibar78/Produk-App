@@ -7,6 +7,7 @@ import android.view.ViewGroup
 import androidx.fragment.app.viewModels
 import com.example.produkapp.databinding.FragmentAccountBinding
 import com.example.produkapp.ui.login.LoginViewModel
+import com.example.produkapp.utils.ResultState
 import com.example.produkapp.utils.ViewModelFactory
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 
@@ -17,7 +18,7 @@ class AccountFragment : BottomSheetDialogFragment() {
     // onDestroyView.
     private val binding get() = _binding!!
 
-    private val viewModel by viewModels<LoginViewModel> {
+    private val viewModel by viewModels<AccountViewModel> {
         ViewModelFactory.getInstance(requireActivity())
     }
 
@@ -32,8 +33,33 @@ class AccountFragment : BottomSheetDialogFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        viewModel.getLoginData().observe(viewLifecycleOwner){loginData->
-            binding.tvAccountName.text = loginData.first
+        viewModel.getUsernameData().observe(viewLifecycleOwner) { username ->
+            if (username.isNotEmpty()) {
+                // Setelah mendapatkan username, cari user di API
+                viewModel.getUserByUsername(username)
+            }
+        }
+        viewModel.userData.observe(viewLifecycleOwner) { result ->
+            when (result) {
+                is ResultState.Loading -> {
+                    binding.tvUsername.text = "Loading..."
+                    binding.tvEmail.text = "Loading..."
+                    binding.tvPassword.text = "Loading..."
+                }
+                is ResultState.Success -> {
+                    val user = result.data
+                    if (user != null) {
+                        binding.tvUsername.text = user.username
+                        binding.tvEmail.text = user.email
+                        binding.tvPassword.text = user.password
+                    } else {
+                        binding.tvUsername.text = "User tidak ditemukan"
+                    }
+                }
+                is ResultState.Error -> {
+                    binding.tvUsername.text = "Gagal mengambil data"
+                }
+            }
         }
     }
     override fun onDestroyView() {
